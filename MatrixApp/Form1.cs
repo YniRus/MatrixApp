@@ -77,12 +77,19 @@ namespace MatrixApp
                 {
                     buttonCustomInput.Enabled = true;
                     buttonRandomFill.Enabled = true;
+
+                    textBox.Text = Value;
                 }
             }
             catch (Exception ex)
             {
                 if (ShowMessage)
-                    MessageBox.Show(ex.Message, "Ошибка!");
+                {
+                    if (Value == "")
+                        MessageBox.Show("Пустое поле порядка матрицы", "Ошибка!");
+                    else
+                        MessageBox.Show(ex.Message, "Ошибка!");
+                }
 
                 textBox.Text = "";
             }
@@ -184,10 +191,14 @@ namespace MatrixApp
 
         private void button4_Click(object sender, EventArgs e)
         {
-            CreateMatrixGrid();
-            RandomFill();
+            TryN(textBox.Text,true);
 
-            buttonFillZeros.Enabled = true;
+            if (N != 0)
+            {
+                CreateMatrixGrid();
+                RandomFill();
+                buttonFillZeros.Enabled = true;
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -197,8 +208,15 @@ namespace MatrixApp
 
         private void button3_Click(object sender, EventArgs e)
         {
-            CreateMatrixGrid();
-            buttonFillZeros.Enabled = true;
+            TryN(textBox.Text, true);
+
+            if (N != 0)
+            {
+                CreateMatrixGrid();
+                buttonFillZeros.Enabled = true;
+            }
+
+
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -252,9 +270,6 @@ namespace MatrixApp
 
         private void textBox_TextChanged(object sender, EventArgs e)
         {
-            buttonCustomInput.Enabled = false;
-            buttonRandomFill.Enabled = false;
-
             buttonFillZeros.Enabled = false;
             buttonSaveToFile.Enabled = false;
         }
@@ -293,6 +308,11 @@ namespace MatrixApp
                 MatrixGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
 
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
