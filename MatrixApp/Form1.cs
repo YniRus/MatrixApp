@@ -24,17 +24,53 @@ namespace MatrixApp
 
         public void CreateMatrixGrid()
         {
+            //--Создание исходной матрицы
+
+            //Очищаем старую
             MatrixGrid.Columns.Clear();
 
+            //Создаем новую
             for (int i = 0; i < N; i++)
             {
                 MatrixGrid.Columns.Add(Convert.ToString(i), Convert.ToString(i));
                 MatrixGrid.Rows.Add();
             }
+
+            //Заполняем нулями
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    MatrixGrid.Rows[i].Cells[j].Value = 0;
+                }
+            }
+        }
+
+        public void CreateMatrixResultGrid()
+        {
+            //--Создание результирующей матрицы
+
+            MatrixResultGrid.Columns.Clear();
+
+            for (int i = 0; i < N; i++)
+            {
+                MatrixResultGrid.Columns.Add(Convert.ToString(i), Convert.ToString(i));
+                MatrixResultGrid.Rows.Add();
+            }
+
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < N; j++)
+                {
+                    MatrixResultGrid.Rows[i].Cells[j].Value = MatrixGrid.Rows[i].Cells[j].Value;
+                }
+            }
         }
 
         public void RandomFill()
         {
+            //--Заполнение матрицы случайными значениями
+
             Random Random = new Random();
 
             for (int i = 0; i < N; i++)
@@ -48,11 +84,16 @@ namespace MatrixApp
 
         public void FillZeros()
         {
+            //-- Заполение ниже главной диагонали нулями
+
+            //Перед этим создаем результирующую матрицу
+            CreateMatrixResultGrid();
+
             for (int i = 0; i < N; i++)
             {
                 for (int j = 0; j < i; j++)
                 {
-                    MatrixGrid.Rows[i].Cells[j].Value = 0;
+                    MatrixResultGrid.Rows[i].Cells[j].Value = 0;
                 }
             }
         }
@@ -65,10 +106,10 @@ namespace MatrixApp
                 N = Convert.ToInt32(Value);
 
                 //Проверка на соответствие границам ОДЗ
-                if (N > 50 || N < 1)
+                if (N > 50 || N < 2)
                 {
                     if(ShowMessage)
-                        MessageBox.Show("Недопустимый порядок матрицы. Допустимый порядок [1,50]", "Ошибка!");
+                        MessageBox.Show("Недопустимый порядок матрицы. Допустимый порядок [2,50]", "Ошибка!");
 
                     N = 0;
                     textBox.Text = "";
@@ -78,7 +119,7 @@ namespace MatrixApp
                     buttonCustomInput.Enabled = true;
                     buttonRandomFill.Enabled = true;
 
-                    textBox.Text = Value;
+                    textBox.Text = Convert.ToString(N);
                 }
             }
             catch (Exception ex)
@@ -113,11 +154,11 @@ namespace MatrixApp
                         var Line = StreamReader.ReadLine(); 
                         string[] Values = Line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (LineIndex == 0)
+                        if (LineIndex == 0) //Первая строка - порядок матрицы
                         {
                             if(Values.Length != 1)
                             {
-                                MessageBox.Show("Входной файл имеет неверный формат");
+                                MessageBox.Show("Входной файл имеет неверную структуру данных");
                                 MatrixGrid.Columns.Clear();
                                 Break = true;
                                 break;
@@ -134,13 +175,21 @@ namespace MatrixApp
                                         MatrixGrid.Columns.Add(Convert.ToString(k), Convert.ToString(k));
                                         MatrixGrid.Rows.Add();
                                     }
+                                else
+                                {
+                                    MessageBox.Show("Входная строка имела недопустимые значения");
+                                    Break = true;
+                                    break;
+                                }
+                                    
+
                             }
                         }
                         else
                         {
-                            if (Values.Length != N)
+                            if (Values.Length != N) //В строке должно быть N чисел
                             {
-                                MessageBox.Show("Входной файл имеет неверный формат");
+                                MessageBox.Show("Входной файл имеет неверную структуру данных");
                                 MatrixGrid.Columns.Clear();
                                 Break = true;
                                 break;
@@ -160,7 +209,7 @@ namespace MatrixApp
                                 }
                                 catch (Exception ex)
                                 {
-                                    MessageBox.Show("Входной файл имеет неверные данные");
+                                    MessageBox.Show("Входная строка имела недопустимые значения");
                                     MatrixGrid.Columns.Clear();
                                     Break = true;
                                     break;
@@ -175,7 +224,7 @@ namespace MatrixApp
 
                     if(LineIndex - 1 != MatrixGrid.RowCount && !Break)
                     {
-                        MessageBox.Show("Входной файл имеет неверный формат");
+                        MessageBox.Show("Входной файл имеет неверную структуру данных");
                         MatrixGrid.Columns.Clear();
                     }
                 }
@@ -238,7 +287,7 @@ namespace MatrixApp
                     {
                         for (int j = 0; j < N; j++)
                         {
-                            StreamWriter.Write(MatrixGrid.Rows[i].Cells[j].Value);
+                            StreamWriter.Write(MatrixResultGrid.Rows[i].Cells[j].Value);
 
                             if (j != N - 1)
                             {
@@ -298,21 +347,16 @@ namespace MatrixApp
             try
             {
                 //Проверка на соответствие формату числа Int32 и на соответствие границам ОДЗ
-                Convert.ToInt32(MatrixGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                MatrixGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = Convert.ToInt32(MatrixGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
 
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка!");
+                MessageBox.Show("Входная строка имела недопустимые значения");
 
                 MatrixGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
 
             }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
